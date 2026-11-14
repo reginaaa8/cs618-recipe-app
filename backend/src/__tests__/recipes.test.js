@@ -16,6 +16,8 @@ describe('creating recipe', () => {
     expect(createdRecipe._id).toBeInstanceOf(mongoose.Types.ObjectId)
     const foundRecipe = await Recipe.findById(createdRecipe._id)
     expect(foundRecipe).toEqual(expect.objectContaining(recipe))
+    expect(foundRecipe.createdAt).toBeInstanceOf(Date)
+    expect(foundRecipe.updatedAt).toBeInstanceOf(Date)
   })
 
   test('without title should fail', async () => {
