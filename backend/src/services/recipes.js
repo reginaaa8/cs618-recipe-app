@@ -29,3 +29,22 @@ export async function listRecipesByIngredients(ingredients, options) {
     options,
   )
 }
+
+export async function getRecipeById(recipeId) {
+  return await Recipe.findById(recipeId)
+}
+
+export async function updateRecipe(
+  recipeId,
+  { title, author, ingredients, imageUrl },
+) {
+  return await Recipe.findOneAndUpdate(
+    { _id: recipeId },
+    { $set: { title, author, ingredients, imageUrl } },
+    { new: true },
+  )
+}
+
+export async function deleteRecipe(recipeId) {
+  return await Recipe.deleteOne({ _id: recipeId })
+}
