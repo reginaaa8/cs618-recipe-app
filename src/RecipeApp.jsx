@@ -2,25 +2,16 @@ import { RecipeList } from './components/RecipeList.jsx'
 import { CreateRecipe } from './components/CreateRecipe.jsx'
 import { RecipeFilter } from './components/RecipeFilter.jsx'
 import { RecipeSorting } from './components/RecipeSorting.jsx'
-
-const recipes = [
-  {
-    title: 'Birria Ramen',
-    author: 'Regina Steffen',
-    ingredients: [
-      '2 packs spicy chicken ramen',
-      '1 pack frozen birria meat',
-      '1 white onion',
-      '1 bunch fresh cilantro',
-      '1 cup mozzarella cheese',
-    ],
-    imageUrl:
-      'https://whatmollymade.com/wp-content/uploads/2023/09/birria-ramen-11.jpg',
-  },
-  { title: 'Grilled Cheese' },
-]
+import { useQuery } from '@tanstack/react-query'
+import { getRecipes } from './api/recipes.js'
 
 export function RecipeApp() {
+  const recipesQuery = useQuery({
+    queryKey: ['recipes'],
+    queryFn: () => getRecipes(),
+  })
+  const recipes = recipesQuery.data ?? []
+
   return (
     <div style={{ padding: 8 }}>
       <CreateRecipe />
