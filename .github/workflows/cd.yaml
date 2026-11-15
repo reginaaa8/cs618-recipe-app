@@ -27,6 +27,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/recipe-app-backend:${{ github.sha }}
+      - name: Wait for image availability
+        run: sleep 30
       - id: deploy-backend
         name: Deploy backend
         uses: google-github-actions/deploy-cloudrun@v1
