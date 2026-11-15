@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { createRecipe } from '../api/recipes.js'
 
@@ -7,6 +7,7 @@ export function CreateRecipe() {
   const [author, setAuthor] = useState('')
   const [ingredients, setIngredients] = useState([''])
   const [imageUrl, setImageUrl] = useState('')
+  const queryClient = useQueryClient()
   const createRecipeMutation = useMutation({
     mutationFn: () =>
       createRecipe({
@@ -17,6 +18,7 @@ export function CreateRecipe() {
           .filter(Boolean),
         imageUrl,
       }),
+    onSuccess: () => queryClient.invalidateQueries(['recipes']),
   })
 
   function addIngredient() {
