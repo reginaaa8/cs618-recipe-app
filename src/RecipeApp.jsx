@@ -20,6 +20,7 @@ export function RecipeApp() {
 
   return (
     <div style={{ padding: 8 }}>
+      <h1>RecipeShare</h1>
       <CreateRecipe />
       <br />
       <hr />
