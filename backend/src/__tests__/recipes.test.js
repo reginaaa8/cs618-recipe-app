@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { describe, expect, test, beforeEach } from '@jest/globals'
+import { describe, expect, test, beforeEach, beforeAll } from '@jest/globals'
 import {
   createRecipe,
   listAllRecipes,
@@ -10,39 +10,47 @@ import {
   deleteRecipe,
 } from '../services/recipes.js'
 import { Recipe } from '../db/models/recipe.js'
+import { createUser } from '../services/users.js'
 
-const sampleRecipes = [
-  {
-    title: 'Scrambled Eggs',
-    author: 'John Doe',
-    ingredients: ['2 eggs', '1 cup cheese'],
-    imageUrl:
-      'https://bellyfull.net/wp-content/uploads/2026/05/Scrambled-Eggs-Hero.jpg',
-  },
-  {
-    title: 'Spaghetti Bolognese',
-    author: 'Daniel Bugl',
-    ingredients: ['8oz dry spaghetti pasta', '1 cup canned bolognese sauce'],
-    imageUrl:
-      'https://www.recipetineats.com/tachyon/2018/07/Spaghetti-Bolognese.jpg?resize=900%2C1260&zoom=0.72',
-  },
-  {
-    title: 'Birria Ramen',
-    author: 'Regina Steffen',
-    ingredients: [
-      '2 packs spicy chicken ramen',
-      '1 pack frozen birria meat',
-      '1 white onion',
-      '1 bunch fresh cilantro',
-      '1 cup mozzarella cheese',
-    ],
-    imageUrl:
-      'https://www.twopurplefigs.com/wp-content/uploads/2022/10/Birria-Ramen-6.jpg',
-  },
-  {
-    title: 'Grilled Cheese',
-  },
-]
+let testUser = null
+let sampleRecipes = []
+
+beforeAll(async () => {
+  testUser = await createUser({ username: 'sample', password: 'user' })
+  sampleRecipes = [
+    {
+      title: 'Scrambled Eggs',
+      author: testUser._id,
+      ingredients: ['2 eggs', '1 cup cheese'],
+      imageUrl:
+        'https://bellyfull.net/wp-content/uploads/2026/05/Scrambled-Eggs-Hero.jpg',
+    },
+    {
+      title: 'Spaghetti Bolognese',
+      author: testUser._id,
+      ingredients: ['8oz dry spaghetti pasta', '1 cup canned bolognese sauce'],
+      imageUrl:
+        'https://www.recipetineats.com/tachyon/2018/07/Spaghetti-Bolognese.jpg?resize=900%2C1260&zoom=0.72',
+    },
+    {
+      title: 'Birria Ramen',
+      author: testUser._id,
+      ingredients: [
+        '2 packs spicy chicken ramen',
+        '1 pack frozen birria meat',
+        '1 white onion',
+        '1 bunch fresh cilantro',
+        '1 cup mozzarella cheese',
+      ],
+      imageUrl:
+        'https://www.twopurplefigs.com/wp-content/uploads/2022/10/Birria-Ramen-6.jpg',
+    },
+    {
+      title: 'Grilled Cheese',
+      author: testUser._id,
+    },
+  ]
+})
 
 let createdSampleRecipes = []
 beforeEach(async () => {
@@ -68,24 +76,24 @@ describe('getting a recipe', () => {
 
 describe('updating recipes', () => {
   test('should update the specified property', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
-      author: 'Test Author',
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
+      title: 'Test Recipe',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
-    expect(updatedRecipe.author).toEqual('Test Author')
+    expect(updatedRecipe.title).toEqual('Test Recipe')
   })
 
   test('should not update other properties', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
-      author: 'Test Author',
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
+      title: 'Test Recipe',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
-    expect(updatedRecipe.title).toEqual('Scrambled Eggs')
+    expect(updatedRecipe.author).toEqual(testUser._id)
   })
 
   test('should update the updatedAt timestamp', async () => {
-    await updateRecipe(createdSampleRecipes[0]._id, {
-      author: 'Test Author',
+    await updateRecipe(testUser._id, createdSampleRecipes[0]._id, {
+      title: 'Test Recipe',
     })
     const updatedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
     expect(updatedRecipe.updatedAt.getTime()).toBeGreaterThan(
@@ -94,23 +102,27 @@ describe('updating recipes', () => {
   })
 
   test('should fail if the id does not exist', async () => {
-    const recipe = await updateRecipe('000000000000000000000000', {
-      author: 'Test Author',
-    })
+    const recipe = await updateRecipe(
+      testUser._id,
+      '000000000000000000000000',
+      {
+        title: 'Test Recipe',
+      },
+    )
     expect(recipe).toEqual(null)
   })
 })
 
-describe('deleting posts', () => {
-  test('should remove the post from the database', async () => {
-    const result = await deleteRecipe(createdSampleRecipes[0]._id)
+describe('deleting recipes', () => {
+  test('should remove the recipe from the database', async () => {
+    const result = await deleteRecipe(testUser._id, createdSampleRecipes[0]._id)
     expect(result.deletedCount).toEqual(1)
     const deletedRecipe = await Recipe.findById(createdSampleRecipes[0]._id)
     expect(deletedRecipe).toEqual(null)
   })
 
   test('should fail if the id does not exist', async () => {
-    const result = await deleteRecipe('000000000000000000000000')
+    const result = await deleteRecipe(testUser._id, '000000000000000000000000')
     expect(result.deletedCount).toEqual(0)
   })
 })
@@ -145,8 +157,8 @@ describe('listing recipes', () => {
   })
 
   test('should be able to filter recipes by author', async () => {
-    const recipes = await listRecipesByAuthor('Regina Steffen')
-    expect(recipes.length).toBe(1)
+    const recipes = await listRecipesByAuthor(testUser.username)
+    expect(recipes.length).toBe(4)
   })
 
   test('should be able to filter recipes by a single ingredient', async () => {
@@ -164,12 +176,11 @@ describe('creating recipes', () => {
   test('with all parameters should succeed', async () => {
     const recipe = {
       title: 'Grilled Cheese',
-      author: 'Test User',
       ingredients: ['2 slices of bread', '2 slices of cheese'],
       imageUrl:
         'https://assets.bonappetit.com/photos/6917b6e28552dda8588ece36/1:1/w_1280,c_limit/best-grilled-cheese_RECIPE_V1_111125_13783_VOG_final.jpg',
     }
-    const createdRecipe = await createRecipe(recipe)
+    const createdRecipe = await createRecipe(testUser._id, recipe)
     expect(createdRecipe._id).toBeInstanceOf(mongoose.Types.ObjectId)
     const foundRecipe = await Recipe.findById(createdRecipe._id)
     expect(foundRecipe).toEqual(expect.objectContaining(recipe))
@@ -179,13 +190,12 @@ describe('creating recipes', () => {
 
   test('without title should fail', async () => {
     const recipe = {
-      author: 'Test User',
       ingredients: ['2 slices of bread', '2 slices of cheese'],
       imageUrl:
         'https://assets.bonappetit.com/photos/6917b6e28552dda8588ece36/1:1/w_1280,c_limit/best-grilled-cheese_RECIPE_V1_111125_13783_VOG_final.jpg',
     }
     try {
-      await createRecipe(recipe)
+      await createRecipe(testUser._id, recipe)
     } catch (err) {
       expect(err).toBeInstanceOf(mongoose.Error.ValidationError)
       expect(err.message).toContain('`title` is required')
@@ -196,7 +206,7 @@ describe('creating recipes', () => {
     const recipe = {
       title: 'Grilled Cheese',
     }
-    const createdRecipe = await createRecipe(recipe)
+    const createdRecipe = await createRecipe(testUser._id, recipe)
     expect(createdRecipe._id).toBeInstanceOf(mongoose.Types.ObjectId)
   })
 })
