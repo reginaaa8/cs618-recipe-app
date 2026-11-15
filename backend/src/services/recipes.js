@@ -1,7 +1,7 @@
 import { Recipe } from '../db/models/recipe.js'
 
-export async function createRecipe({ title, author, ingredients, imageUrl }) {
-  const recipe = new Recipe({ title, author, ingredients, imageUrl })
+export async function createRecipe(userId, { title, ingredients, imageUrl }) {
+  const recipe = new Recipe({ title, author: userId, ingredients, imageUrl })
   return await recipe.save()
 }
 
@@ -35,16 +35,17 @@ export async function getRecipeById(recipeId) {
 }
 
 export async function updateRecipe(
+  userId,
   recipeId,
-  { title, author, ingredients, imageUrl },
+  { title, ingredients, imageUrl },
 ) {
   return await Recipe.findOneAndUpdate(
-    { _id: recipeId },
-    { $set: { title, author, ingredients, imageUrl } },
+    { _id: recipeId, author: userId },
+    { $set: { title, ingredients, imageUrl } },
     { new: true },
   )
 }
 
-export async function deleteRecipe(recipeId) {
-  return await Recipe.deleteOne({ _id: recipeId })
+export async function deleteRecipe(userId, recipeId) {
+  return await Recipe.deleteOne({ _id: recipeId, author: userId })
 }
