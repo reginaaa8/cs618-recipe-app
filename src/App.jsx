@@ -1,4 +1,8 @@
 import { RecipeList } from './components/RecipeList.jsx'
+import { CreateRecipe } from './components/CreateRecipe.jsx'
+import { RecipeFilter } from './components/RecipeFilter.jsx'
+import { RecipeSorting } from './components/RecipeSorting.jsx'
+
 const recipes = [
   {
     title: 'Birria Ramen',
@@ -15,6 +19,19 @@ const recipes = [
   },
   { title: 'Grilled Cheese' },
 ]
+
 export function App() {
-  return <RecipeList recipes={recipes} />
+  return (
+    <div style={{ padding: 8 }}>
+      <CreateRecipe />
+      <br />
+      <hr />
+      Filter by:
+      <RecipeFilter field='author' />
+      <br />
+      <RecipeSorting fields={['createdAt', 'updatedAt']} />
+      <hr />
+      <RecipeList recipes={recipes} />
+    </div>
+  )
 }
