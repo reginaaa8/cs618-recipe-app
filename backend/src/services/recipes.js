@@ -1,4 +1,5 @@
 import { Recipe } from '../db/models/recipe.js'
+import { User } from '../db/models/user.js'
 
 export async function createRecipe(userId, { title, ingredients, imageUrl }) {
   const recipe = new Recipe({ title, author: userId, ingredients, imageUrl })
@@ -15,8 +16,11 @@ async function listRecipes(
 export async function listAllRecipes(options) {
   return await listRecipes({}, options)
 }
-export async function listRecipesByAuthor(author, options) {
-  return await listRecipes({ author }, options)
+export async function listRecipesByAuthor(authorUsername, options) {
+  const user = await User.findOne({ username: authorUsername })
+  if (!user) return []
+
+  return await listRecipes({ author: user._id }, options)
 }
 
 export async function listRecipesByIngredients(ingredients, options) {
