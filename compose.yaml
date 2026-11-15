@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  recipe-app-database:
+    image: mongo
+    ports:
+      - '27017:27017'
+  recipe-app-backend:
+    build: backend/
+    environment:
+      - PORT=3000
+      - DATABASE_URL=mongodb://recipe-app-database:27017/recipes
+    ports:
+      - '3000:3000'
+    depends_on:
+      - recipe-app-database
+  recipe-app-frontend:
+    build:
+      context: .
+      args:
+        VITE_BACKEND_URL: https://reimagined-train-g474qq44vqxf66w-3000.app.github.dev/api/v1
+    ports:
+      - '3001:80'
+    depends_on:
+      - recipe-app-backend
