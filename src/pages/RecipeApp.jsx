@@ -24,7 +24,6 @@ export function RecipeApp() {
       <Header />
       <br />
       <hr />
-      <h1>RecipeShare</h1>
       <CreateRecipe />
       <br />
       <hr />
