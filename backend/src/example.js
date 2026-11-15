@@ -1,20 +1,17 @@
 import { initDatabase } from './db/init.js'
 import { Recipe } from './db/models/recipe.js'
 
+import dotenv from 'dotenv'
+dotenv.config()
+
 await initDatabase()
 
 const recipe = new Recipe({
-  title: 'Birria Ramen',
-  author: 'Regina Steffen',
-  ingredients: [
-    '2 packs chicken ramnen',
-    '1 pack frozen birria meat',
-    '1 white onion',
-    '1 bunch fresh cilantro',
-    '1 cup shredded cheese',
-  ],
+  title: 'Grilled Cheese',
+  author: 'John Doe',
+  ingredients: ['2 slices of bread', '2 slices of cheese'],
   imageURL:
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwI3WPWIO6pkdWSNsmErdNOT91UPQMQ-bXSb7UUM1UNQ&s=10',
+    'https://assets.bonappetit.com/photos/6917b6e28552dda8588ece36/1:1/w_1920,c_limit/best-grilled-cheese_RECIPE_V1_111125_13783_VOG_final.jpg',
 })
 await recipe.save()
 const recipes = await Recipe.find()
