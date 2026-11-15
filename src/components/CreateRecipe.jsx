@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useState } from 'react'
 import { createRecipe } from '../api/recipes.js'
 
 export function CreateRecipe() {
   const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
   const [ingredients, setIngredients] = useState([''])
   const [imageUrl, setImageUrl] = useState('')
+  const [token] = useAuth()
   const queryClient = useQueryClient()
   const createRecipeMutation = useMutation({
     mutationFn: () =>
-      createRecipe({
+      createRecipe(token, {
         title,
-        author,
         ingredients: ingredients
           .map((ingredient) => ingredient.trim())
           .filter(Boolean),
@@ -20,6 +20,8 @@ export function CreateRecipe() {
       }),
     onSuccess: () => queryClient.invalidateQueries(['recipes']),
   })
+
+  if (!token) return <div>Please log in to create new posts.</div>
 
   function addIngredient() {
     setIngredients([...ingredients, ''])
@@ -51,17 +53,6 @@ export function CreateRecipe() {
           name='create-title'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
-      <br />
-      <div>
-        <label htmlFor='create-author'>Author: </label>
-        <input
-          type='text'
-          id='create-author'
-          name='create-author'
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
         />
       </div>
       <br />
