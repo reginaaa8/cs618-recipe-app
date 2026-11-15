@@ -1,7 +1,23 @@
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import { createRecipe } from '../api/recipes.js'
 
 export function CreateRecipe() {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
   const [ingredients, setIngredients] = useState([''])
+  const [imageUrl, setImageUrl] = useState('')
+  const createRecipeMutation = useMutation({
+    mutationFn: () =>
+      createRecipe({
+        title,
+        author,
+        ingredients: ingredients
+          .map((ingredient) => ingredient.trim())
+          .filter(Boolean),
+        imageUrl,
+      }),
+  })
 
   function addIngredient() {
     setIngredients([...ingredients, ''])
@@ -19,12 +35,7 @@ export function CreateRecipe() {
 
   function handleSubmit(e) {
     e.preventDefault()
-
-    const recipeIngredients = ingredients
-      .map((ingredient) => ingredient.trim())
-      .filter(Boolean)
-
-    console.log(recipeIngredients)
+    createRecipeMutation.mutate()
   }
 
   return (
@@ -32,12 +43,24 @@ export function CreateRecipe() {
       <h3>Add a New Recipe</h3>
       <div>
         <label htmlFor='create-title'>Title: </label>
-        <input type='text' id='create-title' name='title' />
+        <input
+          type='text'
+          id='create-title'
+          name='create-title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </div>
       <br />
       <div>
         <label htmlFor='create-author'>Author: </label>
-        <input type='text' id='create-author' name='create-author' />
+        <input
+          type='text'
+          id='create-author'
+          name='create-author'
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
       </div>
       <br />
       <h4>Ingredients</h4>
@@ -66,10 +89,26 @@ export function CreateRecipe() {
       <br />
       <div>
         <label htmlFor='create-imageUrl'>Image URL: </label>
-        <input type='url' id='create-imageUrl' name='imageUrl' />
+        <input
+          type='url'
+          id='create-imageUrl'
+          name='imageUrl'
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+        />
       </div>
       <br />
-      <input type='submit' value='Create Recipe' />
+      <input
+        type='submit'
+        value={createRecipeMutation.isPending ? 'Creating...' : 'Create'}
+        disabled={!title || createRecipeMutation.isPending}
+      />
+      {createRecipeMutation.isSuccess ? (
+        <>
+          <br />
+          Recipe created successfully!
+        </>
+      ) : null}
     </form>
   )
 }
