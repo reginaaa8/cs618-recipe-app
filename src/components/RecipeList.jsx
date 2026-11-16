@@ -4,11 +4,10 @@ import { Recipe } from './Recipe.jsx'
 
 export function RecipeList({ recipes = [] }) {
   return (
-    <div>
+    <div className='space-y-4'>
       {recipes.map((recipe) => (
         <Fragment key={recipe._id}>
           <Recipe {...recipe} />
-          <hr />
         </Fragment>
       ))}
     </div>

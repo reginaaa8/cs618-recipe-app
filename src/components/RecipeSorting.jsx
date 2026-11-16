@@ -8,13 +8,16 @@ export function RecipeSorting({
   onOrderChange,
 }) {
   return (
-    <div>
-      <label htmlFor='sortBy'>Sort By: </label>
+    <div className='flex items-center gap-6'>
+      <label htmlFor='sortBy' className='font-semibold mr-2'>
+        Sort By:{' '}
+      </label>
       <select
         name='sortBy'
         id='sortBy'
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        className='border rounded-lg p-2 bg-white'
       >
         {fields.map((field) => (
           <option key={field} value={field}>
@@ -22,13 +25,15 @@ export function RecipeSorting({
           </option>
         ))}
       </select>
-      {' / '}
-      <label htmlFor='sortOrder'>Sort Order: </label>
+      <label htmlFor='sortOrder' className='font-semibold mr-2'>
+        Sort Order:{' '}
+      </label>
       <select
         name='sortOrder'
         id='sortOrder'
         value={orderValue}
         onChange={(e) => onOrderChange(e.target.value)}
+        className='border rounded-lg p-2 bg-white'
       >
         <option value={'ascending'}>ascending</option>
         <option value={'descending'}>descending</option>

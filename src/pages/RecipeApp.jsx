@@ -20,29 +20,26 @@ export function RecipeApp() {
   const recipes = recipesQuery.data ?? []
 
   return (
-    <div style={{ padding: 8 }}>
+    <div className='min-h-screen bg-[#FAF8F3]'>
       <Header />
-      <br />
-      <hr />
-      <CreateRecipe />
-      <br />
-      <hr />
-      Filter by:
-      <RecipeFilter
-        field='author'
-        value={author}
-        onChange={(value) => setAuthor(value)}
-      />
-      <br />
-      <RecipeSorting
-        fields={['createdAt', 'updatedAt']}
-        value={sortBy}
-        onChange={(value) => setSortBy(value)}
-        orderValue={sortOrder}
-        onOrderChange={(orderValue) => setSortOrder(orderValue)}
-      />
-      <hr />
-      <RecipeList recipes={recipes} />
+      <main className='max-w-6xl mx-auto px-4 pt-6 space-y-6'>
+        <CreateRecipe />
+        <div className='flex items-center gap-6 '>
+          <RecipeFilter
+            field='author'
+            value={author}
+            onChange={(value) => setAuthor(value)}
+          />
+          <RecipeSorting
+            fields={['createdAt', 'updatedAt']}
+            value={sortBy}
+            onChange={(value) => setSortBy(value)}
+            orderValue={sortOrder}
+            onOrderChange={(orderValue) => setSortOrder(orderValue)}
+          />
+        </div>
+        <RecipeList recipes={recipes} />
+      </main>
     </div>
   )
 }
